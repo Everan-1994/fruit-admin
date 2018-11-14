@@ -1,5 +1,4 @@
 import Main from '@/components/main'
-import parentView from '@/components/parent-view'
 
 /**
  * iview-admin中meta除了原生参数外可配置的参数:
@@ -75,7 +74,8 @@ export default [
         name: 'error_logger',
         meta: {
             hideInBread: true,
-            hideInMenu: true
+            hideInMenu: true,
+            // access: [1]
         },
         component: Main,
         children: [
@@ -91,8 +91,37 @@ export default [
         ]
     },
     {
-        path: '/argu',
-        name: 'argu',
+        path: '/member',
+        name: 'member',
+        meta: {
+            icon: 'ios-ionitron-outline',
+            title: '用户管理'
+        },
+        component: Main,
+        children: [
+            {
+                path: 'admins',
+                name: 'admins',
+                meta: {
+                    icon: 'md-contact',
+                    title: '管理员'
+                },
+                component: () => import('@/view/member/admins.vue')
+            },
+            {
+                path: 'users',
+                name: 'users',
+                meta: {
+                    icon: 'md-contacts',
+                    title: '用户'
+                },
+                component: () => import('@/view/member/users.vue')
+            }
+        ]
+    },
+    {
+        path: '/others',
+        name: 'others',
         meta: {
             hideInMenu: true
         },
