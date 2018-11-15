@@ -1,21 +1,20 @@
 import {
     login,
     logout,
-    getUserInfo,
     getMessage,
     getContentByMsgId,
     hasRead,
     removeReaded,
     restoreTrash
 } from '@/api/user'
-import {setToken, getToken} from '@/libs/util'
+import {setToken, delToken, setLocalStorage, delLocalStorage} from '@/libs/util'
 
 export default {
     state: {
         userName: '',
         userId: '',
-        avatorImgPath: '',
-        token: getToken(),
+        avatarImgPath: '',
+        token: '',
         access: '',
         hasGetInfo: false,
         messageUnreadList: [],
@@ -24,17 +23,21 @@ export default {
         messageContentStore: {}
     },
     mutations: {
-        setAvator(state, avatorPath) {
-            state.avatorImgPath = avatorPath
+        setAvatar(state, avatarPath) {
+            state.avatarImgPath = avatarPath;
+            setLocalStorage('avatar', avatarPath);
         },
         setUserId(state, id) {
-            state.userId = id
+            state.userId = id;
+            setLocalStorage('id', id);
         },
         setUserName(state, name) {
-            state.userName = name
+            state.userName = name;
+            setLocalStorage('name', name);
         },
         setAccess(state, access) {
-            state.access = access
+            state.access = access;
+            setLocalStorage('access', access);
         },
         setToken(state, token) {
             state.token = token
@@ -76,9 +79,14 @@ export default {
                     userName,
                     password
                 }).then(res => {
-                    const data = res.data
-                    console.log('data', data)
-                    // commit('setToken', data.token)
+                    const data = res.data.data
+                    commit('setToken', `${data.meta.tokenType} ${data.meta.accessToken}`);
+                    commit('setAvatar', data.data.avatar || 'https://file.iviewui.com/dist/a0e88e83800f138b94d2414621bd9704.png');
+                    commit('setUserName', data.data.remark || data.data.name);
+                    commit('setUserId', data.data.id);
+                    commit('setAccess', data.data.identify);
+                    commit('setHasGetInfo', true);
+
                     resolve()
                 }).catch(err => {
                     reject(err)
@@ -88,37 +96,37 @@ export default {
         // 退出登录
         handleLogOut({state, commit}) {
             return new Promise((resolve, reject) => {
-                logout(state.token).then(() => {
-                    commit('setToken', '')
-                    commit('setAccess', [])
+                logout().then(() => {
+                    commit('setToken', '');
+                    commit('setAccess', '');
+                    commit('setAvatar', '');
+                    commit('setUserName', '');
+                    commit('setUserId', 0);
+                    commit('setHasGetInfo', false);
+
+                    delLocalStorage('id');
+                    delLocalStorage('name');
+                    delLocalStorage('avatar');
+                    delLocalStorage('access');
+                    delToken();
+
                     resolve()
                 }).catch(err => {
+                    commit('setToken', '');
+                    commit('setAccess', '');
+                    commit('setAvatar', '');
+                    commit('setUserName', '');
+                    commit('setUserId', 0);
+                    commit('setHasGetInfo', false);
+
+                    delLocalStorage('id');
+                    delLocalStorage('name');
+                    delLocalStorage('avatar');
+                    delLocalStorage('access');
+                    delToken();
+
                     reject(err)
                 })
-                // 如果你的退出登录无需请求接口，则可以直接使用下面三行代码而无需使用logout调用接口
-                // commit('setToken', '')
-                // commit('setAccess', [])
-                // resolve()
-            })
-        },
-        // 获取用户相关信息
-        getUserInfo({state, commit}) {
-            return new Promise((resolve, reject) => {
-                try {
-                    getUserInfo(state.token).then(res => {
-                        const data = res.data
-                        commit('setAvator', data.avator)
-                        commit('setUserName', data.name)
-                        commit('setUserId', data.user_id)
-                        commit('setAccess', data.access)
-                        commit('setHasGetInfo', true)
-                        resolve(data)
-                    }).catch(err => {
-                        reject(err)
-                    })
-                } catch (error) {
-                    reject(error)
-                }
             })
         },
         // 获取消息列表，其中包含未读、已读、回收站三个列表
