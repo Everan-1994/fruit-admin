@@ -38,22 +38,22 @@
                 _this.$Message.loading({
                     content: '登录中...',
                     duration: 60,
-                });
+                })
 
                 _this.handleLogin({userName, password}).then(res => {
                     setTimeout(() => {
-                        _this.loading = false;
-                        _this.$Message.destroy();
+                        _this.loading = false
+                        _this.$Message.destroy()
                         _this.$router.push({
                             name: this.$config.homeName
                         })
                     }, 1000)
                 }).catch(err => {
                     setTimeout(() => {
-                        _this.loading = false;
-                        _this.$Message.destroy();
-                        _this.$Message.error(err.response.data.message);
-                    }, 1000);
+                        _this.loading = false
+                        _this.$Message.destroy()
+                        _this.$Message.error(err.response.data.message)
+                    }, 1000)
                 })
             }
 
