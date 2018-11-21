@@ -17,6 +17,18 @@
                 </DropdownItem>
             </DropdownMenu>
         </Dropdown>
+        <Modal v-model="logoutm" width="360">
+            <p slot="header" style="color:#f60;text-align:center">
+                <Icon type="ios-information-circle"></Icon>
+                <span>温馨提示</span>
+            </p>
+            <div style="text-align:center">
+                <h3>确定要退出系统吗？</h3>
+            </div>
+            <div slot="footer">
+                <Button type="error" size="large" long :loading="loading" @click="logout">确定退出</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -26,6 +38,12 @@
 
     export default {
         name: 'User',
+        data() {
+            return {
+                logoutm: false,
+                loading: false
+            }
+        },
         props: {
             userAvator: {
                 type: String,
@@ -41,10 +59,23 @@
                 'handleLogOut'
             ]),
             logout() {
+                this.loading = true;
                 this.handleLogOut().then(() => {
-                    this.$router.push({
-                        name: 'login'
-                    })
+                    setTimeout(() => {
+                        this.logoutm = false;
+                        this.loading = false;
+                        this.$router.push({
+                            name: 'login'
+                        })
+                    }, 1500);
+                }).catch(() => {
+                    setTimeout(() => {
+                        this.logoutm = false;
+                        this.loading = false;
+                        this.$router.push({
+                            name: 'login'
+                        })
+                    }, 1500);
                 })
             },
             message() {
@@ -55,7 +86,7 @@
             handleClick(name) {
                 switch (name) {
                     case 'logout':
-                        this.logout()
+                        this.logoutm = true;
                         break
                     case 'message':
                         this.message()

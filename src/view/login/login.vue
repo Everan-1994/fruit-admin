@@ -24,9 +24,9 @@
             LoginForm
         },
         data() {
-          return {
-              loading: false
-          }
+            return {
+                loading: false
+            }
         },
         methods: {
             ...mapActions([
@@ -34,6 +34,7 @@
             ]),
             handleSubmit({userName, password}) {
                 const _this = this;
+                _this.loading = true
 
                 _this.$Message.loading({
                     content: '登录中...',
